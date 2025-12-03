@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    ports:
+      - "6565:6565"
+      - "8080:8080"
+      - "8000:8000"
+    environment:
+      - AB_CLIENT_ID=${AB_CLIENT_ID}
+      - AB_CLIENT_SECRET=${AB_CLIENT_SECRET}
+      - AB_BASE_URL=${AB_BASE_URL}
+      - AB_NAMESPACE=${AB_NAMESPACE}
+      - PLUGIN_GRPC_SERVER_AUTH_ENABLED
+      - OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://host.docker.internal:9411/api/v2/spans # Zipkin
+      - OTEL_SERVICE_NAME=ExtendServiceExtensionServerGo
+      - BASE_PATH
+      # - GRPC_GO_LOG_VERBOSITY_LEVEL="99" # enable to debug grpc
+      # - GRPC_GO_LOG_SEVERITY_LEVEL=info # enable to debug grpc
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    # logging:
+    #   driver: loki
+    #   options:
+    #     loki-url: http://host.docker.internal:3100/loki/api/v1/push
+    #     mode: non-blocking
+    #     max-buffer-size: 4m
+    #     loki-retries: "3"

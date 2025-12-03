@@ -1,0 +1,416 @@
+{
+	"info": {
+		"_postman_id": "2fc614dd-6e3c-4192-a991-e9f8e99809fe",
+		"name": "Extend EAC Policy Demo",
+		"description": "Sample calls for the EAC Policy extension. Configure variables: AB_BASE_URL, AB_NAMESPACE, AB_CLIENT_ID, AB_CLIENT_SECRET, EXTEND_APP_SERVICE_URL, USER_ACCESS_TOKEN (user JWT), TEST_USER_ID.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21432124"
+	},
+	"item": [
+		{
+			"name": "01-get-client-access-token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Store client access token in collection variable\", function () {\r",
+							"    var responseJson = pm.response.json();\r",
+							"    \r",
+							"    if (responseJson.access_token !== undefined) {\r",
+							"        pm.collectionVariables.set('CLIENT_ACCESS_TOKEN', responseJson.access_token)\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{AB_CLIENT_SECRET}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{AB_CLIENT_ID}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{AB_BASE_URL}}/iam/v3/oauth/token",
+					"host": [
+						"{{AB_BASE_URL}}"
+					],
+					"path": [
+						"iam",
+						"v3",
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02-create-test-users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Test users created successfully\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    var responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.data).to.be.an('array');\r",
+							"    \r",
+							"    // Store user credentials for demo collection\r",
+							"    if (responseJson.data.length >= 2) {\r",
+							"        pm.collectionVariables.set('TEST_USER_ID_1', responseJson.data[0].userId);\r",
+							"        pm.collectionVariables.set('TEST_USER_EMAIL_1', responseJson.data[0].emailAddress);\r",
+							"        pm.collectionVariables.set('TEST_USER_PASSWORD_1', responseJson.data[0].password);\r",
+							"\r",
+							"        pm.collectionVariables.set('TEST_USER_ID_2', responseJson.data[1].userId);\r",
+							"        pm.collectionVariables.set('TEST_USER_EMAIL_2', responseJson.data[1].emailAddress);\r",
+							"        pm.collectionVariables.set('TEST_USER_PASSWORD_2', responseJson.data[1].password);\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{CLIENT_ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"count\": 2,\n    \"userInfo\": {\n        \"country\": \"US\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{AB_BASE_URL}}/iam/v4/admin/namespaces/{{AB_NAMESPACE}}/test_users",
+					"host": [
+						"{{AB_BASE_URL}}"
+					],
+					"path": [
+						"iam",
+						"v4",
+						"admin",
+						"namespaces",
+						"{{AB_NAMESPACE}}",
+						"test_users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03-get-user-access-token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Store user access token in collection variable\", function () {\r",
+							"    var responseJson = pm.response.json();\r",
+							"    \r",
+							"    if (responseJson.access_token !== undefined) {\r",
+							"        pm.collectionVariables.set('USER_ACCESS_TOKEN', responseJson.access_token)\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{AB_CLIENT_ID}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{AB_CLIENT_SECRET}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{TEST_USER_EMAIL_1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{TEST_USER_PASSWORD_1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{AB_BASE_URL}}/iam/v3/oauth/token",
+					"host": [
+						"{{AB_BASE_URL}}"
+					],
+					"path": [
+						"iam",
+						"v3",
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04-report-public-violation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{USER_ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userId\": \"{{TEST_USER_ID}}\",\n  \"clientActionReason\": \"CLIENT_ACTION_REASON_CLIENT_VIOLATION\",\n  \"clientActionDetailsReasonString\": \"detected cheat signature\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EXTEND_APP_SERVICE_URL}}/v1/public/anti-cheat/eac/report",
+					"host": [
+						"{{EXTEND_APP_SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"public",
+						"anti-cheat",
+						"eac",
+						"report"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05-report-admin-violation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{CLIENT_ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userId\": \"{{TEST_USER_ID}}\",\n  \"clientActionReason\": \"CLIENT_ACTION_REASON_CLIENT_VIOLATION\",\n  \"clientActionDetailsReasonString\": \"server enforcement\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EXTEND_APP_SERVICE_URL}}/v1/admin/anti-cheat/eac/report",
+					"host": [
+						"{{EXTEND_APP_SERVICE_URL}}"
+					],
+					"path": [
+						"v1",
+						"admin",
+						"anti-cheat",
+						"eac",
+						"report"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "CLIENT_ACCESS_TOKEN",
+			"value": ""
+		},
+		{
+			"key": "USER_ACCESS_TOKEN",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_ID",
+			"value": ""
+		},
+		{
+			"key": "AB_BASE_URL",
+			"value": ""
+		},
+		{
+			"key": "EXTEND_APP_SERVICE_URL",
+			"value": ""
+		},
+		{
+			"key": "AB_CLIENT_ID",
+			"value": ""
+		},
+		{
+			"key": "AB_CLIENT_SECRET",
+			"value": ""
+		},
+		{
+			"key": "AB_NAMESPACE",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_ID_1",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_ID_2",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_EMAIL_1",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_PASSWORD_1",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_EMAIL_2",
+			"value": ""
+		},
+		{
+			"key": "TEST_USER_PASSWORD_2",
+			"value": ""
+		}
+	]
+}

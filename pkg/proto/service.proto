@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+option csharp_namespace = "AccelByte.Extend.ServiceExtension";
+option go_package = "accelbyte.net/extend/serviceextension";
+option java_package = "net.accelbyte.extend.serviceextension";
+option java_multiple_files = true;
+
+package service;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+service AntiCheatService {
+  rpc ReportClientIntegrityViolation (EACIntegrityReportRequest) returns (EACReportResponse) {
+    option (google.api.http) = {
+      post: "/v1/public/anti-cheat/eac/integrity/report"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Submit client integrity violation"
+      description: "Receives EAC integrity violation report from the game client (public)."
+      security: {
+        security_requirement: {
+          key: "Bearer"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc ReportPublicViolation (EACReportRequest) returns (EACReportResponse) {
+    option (google.api.http) = {
+      post: "/v1/public/anti-cheat/eac/report"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Submit client EAC violation"
+      description: "Receives EAC violation report from the game client and applies policy (public)."
+      security: {
+        security_requirement: {
+          key: "Bearer"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc ReportAdminViolation (EACReportRequest) returns (EACReportResponse) {
+    option (google.api.http) = {
+      post: "/v1/admin/anti-cheat/eac/report"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Submit server EAC violation"
+      description: "Receives EAC violation report from dedicated server/admin and applies policy."
+      security: {
+        security_requirement: {
+          key: "Bearer"
+          value: {}
+        }
+      }
+    };
+  }
+}
+
+enum ClientActionReason {
+  ACTION_INVALID_UNSPECIFIED = 0;
+  ACTION_INTERNAL_ERROR = 1;
+  ACTION_INVALID_MESSAGE = 2;
+  ACTION_AUTHENTICATION_FAILED = 3;
+  ACTION_NULL_CLIENT = 4;
+  ACTION_HEARTBEAT_TIMEOUT = 5;
+  ACTION_CLIENT_VIOLATION = 6;
+  ACTION_BACKEND_VIOLATION = 7;
+  ACTION_TEMPORARY_COOLDOWN = 8;
+  ACTION_TEMPORARY_BANNED = 9;
+  ACTION_PERMANENT_BANNED = 10;
+}
+
+enum IntegrityViolationType {
+  INTEGRITY_INVALID_UNSPECIFIED = 0;
+  INTEGRITY_CATALOG_NOT_FOUND = 1;
+  INTEGRITY_CATALOG_ERROR = 2;
+  INTEGRITY_CATALOG_CERTIFICATE_REVOKED = 3;
+  INTEGRITY_CATALOG_MISSING_MAIN_EXECUTABLE = 4;
+  INTEGRITY_GAME_FILE_MISMATCH = 5;
+  INTEGRITY_REQUIRED_GAME_FILE_NOT_FOUND = 6;
+  INTEGRITY_UNKNOWN_GAME_FILE_FORBIDDEN = 7;
+  INTEGRITY_SYSTEM_FILE_UNTRUSTED = 8;
+  INTEGRITY_FORBIDDEN_MODULE_LOADED = 9;
+  INTEGRITY_CORRUPTED_MEMORY = 10;
+  INTEGRITY_FORBIDDEN_TOOL_DETECTED = 11;
+  INTEGRITY_INTERNAL_ANTI_CHEAT_VIOLATION = 12;
+  INTEGRITY_CORRUPTED_NETWORK_MESSAGE_FLOW = 13;
+  INTEGRITY_VIRTUAL_MACHINE_NOT_ALLOWED = 14;
+  INTEGRITY_FORBIDDEN_SYSTEM_CONFIGURATION = 15;
+}
+
+enum AppliedAction {
+  UNSPECIFIED = 0;
+  LOGGED = 1;
+  REPORTED = 2;
+  TEMP_BANNED = 3;
+  PERM_BANNED = 4;
+}
+
+message EACReportRequest {
+  string user_id = 1;
+  ClientActionReason client_action_reason = 2;
+  string client_action_details_reason_string = 3;
+  string session_id = 4;
+}
+
+message EACIntegrityReportRequest {
+  string user_id = 1;
+  IntegrityViolationType violation_type = 2;
+  string violation_message = 3;
+}
+
+message EACReportResponse {
+  AppliedAction applied_action = 1;
+  bool telemetry_recorded = 2;
+  bool moderation_reported = 3;
+  int64 ban_duration_seconds = 4;
+}
+
+// OpenAPI options for the entire API.
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Anti-Cheat Reporting API";
+    version: "1.0";
+  };
+  base_path: "/";
+
+  security_definitions: {
+    security: {
+      key: "Bearer";
+      value: {
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+        name: "Authorization";
+      }
+    }
+  };
+};

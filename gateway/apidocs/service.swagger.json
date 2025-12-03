@@ -1,0 +1,274 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Anti-Cheat Reporting API",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "AntiCheatService"
+    }
+  ],
+  "basePath": "/",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/admin/anti-cheat/eac/report": {
+      "post": {
+        "summary": "Submit server EAC violation",
+        "description": "Receives EAC violation report from dedicated server/admin and applies policy.",
+        "operationId": "AntiCheatService_ReportAdminViolation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceEACReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceEACReportRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AntiCheatService"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/public/anti-cheat/eac/integrity/report": {
+      "post": {
+        "summary": "Submit client integrity violation",
+        "description": "Receives EAC integrity violation report from the game client (public).",
+        "operationId": "AntiCheatService_ReportClientIntegrityViolation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceEACReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceEACIntegrityReportRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AntiCheatService"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/public/anti-cheat/eac/report": {
+      "post": {
+        "summary": "Submit client EAC violation",
+        "description": "Receives EAC violation report from the game client and applies policy (public).",
+        "operationId": "AntiCheatService_ReportPublicViolation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceEACReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceEACReportRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AntiCheatService"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "serviceAppliedAction": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "LOGGED",
+        "REPORTED",
+        "TEMP_BANNED",
+        "PERM_BANNED"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "serviceClientActionReason": {
+      "type": "string",
+      "enum": [
+        "ACTION_INVALID_UNSPECIFIED",
+        "ACTION_INTERNAL_ERROR",
+        "ACTION_INVALID_MESSAGE",
+        "ACTION_AUTHENTICATION_FAILED",
+        "ACTION_NULL_CLIENT",
+        "ACTION_HEARTBEAT_TIMEOUT",
+        "ACTION_CLIENT_VIOLATION",
+        "ACTION_BACKEND_VIOLATION",
+        "ACTION_TEMPORARY_COOLDOWN",
+        "ACTION_TEMPORARY_BANNED",
+        "ACTION_PERMANENT_BANNED"
+      ],
+      "default": "ACTION_INVALID_UNSPECIFIED"
+    },
+    "serviceEACIntegrityReportRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "violationType": {
+          "$ref": "#/definitions/serviceIntegrityViolationType"
+        },
+        "violationMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "serviceEACReportRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "clientActionReason": {
+          "$ref": "#/definitions/serviceClientActionReason"
+        },
+        "clientActionDetailsReasonString": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      }
+    },
+    "serviceEACReportResponse": {
+      "type": "object",
+      "properties": {
+        "appliedAction": {
+          "$ref": "#/definitions/serviceAppliedAction"
+        },
+        "telemetryRecorded": {
+          "type": "boolean"
+        },
+        "moderationReported": {
+          "type": "boolean"
+        },
+        "banDurationSeconds": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "serviceIntegrityViolationType": {
+      "type": "string",
+      "enum": [
+        "INTEGRITY_INVALID_UNSPECIFIED",
+        "INTEGRITY_CATALOG_NOT_FOUND",
+        "INTEGRITY_CATALOG_ERROR",
+        "INTEGRITY_CATALOG_CERTIFICATE_REVOKED",
+        "INTEGRITY_CATALOG_MISSING_MAIN_EXECUTABLE",
+        "INTEGRITY_GAME_FILE_MISMATCH",
+        "INTEGRITY_REQUIRED_GAME_FILE_NOT_FOUND",
+        "INTEGRITY_UNKNOWN_GAME_FILE_FORBIDDEN",
+        "INTEGRITY_SYSTEM_FILE_UNTRUSTED",
+        "INTEGRITY_FORBIDDEN_MODULE_LOADED",
+        "INTEGRITY_CORRUPTED_MEMORY",
+        "INTEGRITY_FORBIDDEN_TOOL_DETECTED",
+        "INTEGRITY_INTERNAL_ANTI_CHEAT_VIOLATION",
+        "INTEGRITY_CORRUPTED_NETWORK_MESSAGE_FLOW",
+        "INTEGRITY_VIRTUAL_MACHINE_NOT_ALLOWED",
+        "INTEGRITY_FORBIDDEN_SYSTEM_CONFIGURATION"
+      ],
+      "default": "INTEGRITY_INVALID_UNSPECIFIED"
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}
