@@ -161,9 +161,6 @@ func checkAuthorizationMetadata(ctx context.Context, permission *iam.Permission)
 		return status.Error(codes.Internal, "authorization token validator is not set")
 	}
 
-	// Permission check is disabled; we only validate token presence and authenticity.
-	permission = nil
-
 	meta, found := metadata.FromIncomingContext(ctx)
 
 	if !found {

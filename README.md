@@ -22,7 +22,7 @@ This Extend app turns Easy Anti-Cheat (EAC) signals into AccelByte telemetry, mo
 
 ## Endpoints
 - `POST /v1/public/anti-cheat/eac/report` — user token, requires `sessionId` unless session validation is disabled. Verifies the caller is the session leader and that `userId` belongs to the session.
-- `POST /v1/admin/anti-cheat/eac/report` — service/admin token, requires `sessionId` unless session validation is disabled. Verifies `userId` is in the session (no leader requirement).
+- `POST /v1/admin/anti-cheat/eac/report` — service/admin token with `ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC [CREATE]` permission, requires `sessionId` unless session validation is disabled. Verifies `userId` is in the session (no leader requirement).
 - `POST /v1/public/anti-cheat/eac/integrity/report` — user token, no session check. Maps integrity violations to client policy actions before executing telemetry/report/ban.
 
 Violation body (public/admin):
@@ -122,9 +122,12 @@ Response (all endpoints):
 - Public route requires caller to be the session leader, admin route only checks membership.
 
 ### Required IAM permissions
+- To call admin endpoint: `ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC [CREATE]`.
 - To ban user: `ADMIN:NAMESPACE:{namespace}:BAN [CREATE]`.
 - To use session validation: `NAMESPACE:{namespace}:session:game [read]`.
 - To report user: `ADMIN:NAMESPACE:{namespace}:TICKET [CREATE]` (note: reporting is not supported until the 2026.2 release, current flow returns an error that we ignore while continuing with the ban action).
+
+> **Warning**: Custom permission protection (e.g., `ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC`) is only supported in **private cloud** environments. For **shared cloud**, custom permission support is still in development.
 
 ## Build & Run
 - Regenerate protos/openapi: `make build` (dockerized) or `./proto.sh`.

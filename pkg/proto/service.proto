@@ -9,6 +9,7 @@ package service;
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "permission.proto";
 
 service AntiCheatService {
   rpc ReportClientIntegrityViolation (EACIntegrityReportRequest) returns (EACReportResponse) {
@@ -46,13 +47,15 @@ service AntiCheatService {
   }
 
   rpc ReportAdminViolation (EACReportRequest) returns (EACReportResponse) {
+    option (permission.resource) = "ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC";
+    option (permission.action) = CREATE;
     option (google.api.http) = {
       post: "/v1/admin/anti-cheat/eac/report"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Submit server EAC violation"
-      description: "Receives EAC violation report from dedicated server/admin and applies policy."
+      description: "Receives EAC violation report from dedicated server/admin and applies policy.\n\n**Required permission**: `ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC [CREATE]`\n\n**Note**: Custom permission protection is only supported in private cloud environments. For shared cloud, custom permission support is still in development."
       security: {
         security_requirement: {
           key: "Bearer"

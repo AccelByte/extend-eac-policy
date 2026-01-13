@@ -20,7 +20,7 @@
     "/v1/admin/anti-cheat/eac/report": {
       "post": {
         "summary": "Submit server EAC violation",
-        "description": "Receives EAC violation report from dedicated server/admin and applies policy.",
+        "description": "Receives EAC violation report from dedicated server/admin and applies policy.\n\n**Required permission**: `ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC [CREATE]`\n\n**Note**: Custom permission protection is only supported in private cloud environments. For shared cloud, custom permission support is still in development.",
         "operationId": "AntiCheatService_ReportAdminViolation",
         "responses": {
           "200": {
