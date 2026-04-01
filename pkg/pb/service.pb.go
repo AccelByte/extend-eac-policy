@@ -492,7 +492,7 @@ const file_service_proto_rawDesc = "" +
 	"\x06LOGGED\x10\x01\x12\f\n" +
 	"\bREPORTED\x10\x02\x12\x0f\n" +
 	"\vTEMP_BANNED\x10\x03\x12\x0f\n" +
-	"\vPERM_BANNED\x10\x042\xc1\b\n" +
+	"\vPERM_BANNED\x10\x042\xb1\a\n" +
 	"\x10AntiCheatService\x12\x94\x02\n" +
 	"\x1eReportClientIntegrityViolation\x12\".service.EACIntegrityReportRequest\x1a\x1a.service.EACReportResponse\"\xb1\x01\x92Ay\x12!Submit client integrity violation\x1aFReceives EAC integrity violation report from the game client (public).b\f\n" +
 	"\n" +
@@ -501,15 +501,13 @@ const file_service_proto_rawDesc = "" +
 	"\x15ReportPublicViolation\x12\x19.service.EACReportRequest\x1a\x1a.service.EACReportResponse\"\xaa\x01\x92A|\x12\x1bSubmit client EAC violation\x1aOReceives EAC violation report from the game client and applies policy (public).b\f\n" +
 	"\n" +
 	"\n" +
-	"\x06Bearer\x12\x00\x82\xd3\xe4\x93\x02%:\x01*\" /v1/public/anti-cheat/eac/report\x12\x97\x04\n" +
-	"\x14ReportAdminViolation\x12\x19.service.EACReportRequest\x1a\x1a.service.EACReportResponse\"\xc7\x03\x92A\xe8\x02\x12\x1bSubmit server EAC violation\x1a\xba\x02Receives EAC violation report from dedicated server/admin and applies policy.\n" +
+	"\x06Bearer\x12\x00\x82\xd3\xe4\x93\x02%:\x01*\" /v1/public/anti-cheat/eac/report\x12\x87\x03\n" +
+	"\x14ReportAdminViolation\x12\x19.service.EACReportRequest\x1a\x1a.service.EACReportResponse\"\xb7\x02\x92A\xd1\x01\x12\x1bSubmit server EAC violation\x1a\xa3\x01Receives EAC violation report from dedicated server/admin and applies policy.\n" +
 	"\n" +
-	"**Required permission**: `ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC [CREATE]`\n" +
-	"\n" +
-	"**Note**: Custom permission protection is only supported in private cloud environments. For shared cloud, custom permission support is still in development.b\f\n" +
+	"**Required permission**: `CUSTOM:ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC [CREATE]`b\f\n" +
 	"\n" +
 	"\n" +
-	"\x06Bearer\x12\x00\x8a\xb5\x18)ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC\x90\xb5\x18\x01\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/admin/anti-cheat/eac/reportB\xbc\x01\x92AE\x12\x1f\n" +
+	"\x06Bearer\x12\x00\x8a\xb5\x180CUSTOM:ADMIN:NAMESPACE:{namespace}:ANTICHEAT:EAC\x90\xb5\x18\x01\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/admin/anti-cheat/eac/reportB\xbc\x01\x92AE\x12\x1f\n" +
 	"\x18Anti-Cheat Reporting API2\x031.0\"\x01/Z\x1f\n" +
 	"\x1d\n" +
 	"\x06Bearer\x12\x13\b\x02\x1a\rAuthorization \x02\n" +
